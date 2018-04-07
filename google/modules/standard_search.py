@@ -12,7 +12,6 @@ from urllib.parse import unquote
 from unidecode import unidecode
 from re import match
 
-
 class GoogleResult(object):
 
     """Represents a google search result."""

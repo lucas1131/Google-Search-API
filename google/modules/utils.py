@@ -11,7 +11,7 @@ from selenium import webdriver
 import urllib.request, urllib.error, urllib.parse
 from functools import wraps
 # import requests
-from urllib.parse import urlencode
+from urllib.parse import urlencode, quote
 
 
 def measure_time(fn):
@@ -46,6 +46,32 @@ def _get_search_url(query, page=0, per_page=10, lang='en'):
     return url
 
 
+def _get_news_search_url(query, lang='pt-BR', region='br', sortby='r'):
+
+    query = query + u"/" + query
+    query = quote(query)
+
+    # Variables: ? hl=en & gl=US & ned=us
+    # Brasil: ned=pt-BR_br & gl=BR & hl=pt-BR
+    # Google news search parameters:
+    # http://i-tweak.blogspot.com.br/2013/10/google-news-search-parameters-missing.html
+    params = {
+        'hl': lang,
+        'gl': region,
+        'ned': lang + '_' + region,
+        'scoring': sortby 
+    }
+    params = urlencode(params)
+    
+    # http://www.google.com/search?q=pabllo+vittar&start=0&num=10&nl=en
+    # Examples:
+    # https://news.google.com/news/search/section/q/youtube/youtube?hl=en&gl=US&ned=us
+    # https://news.google.com/news/search/section/q/pabllo%20vittar/pabllo%20vittar?hl=en&gl=US&ned=us
+    url = u"https://news.google.com/news/search/section/q/"+query+u"?"+params
+    
+    return url.encode('utf8')
+
+
 def get_html(url):
     header = "Mozilla/5.001 (windows; U; NT4.0; en-US; rv:1.0) Gecko/25250101"
     try:
@@ -54,13 +80,13 @@ def get_html(url):
         html = urllib.request.urlopen(request).read()
         return html
     except urllib.error.HTTPError as e:
-        print("Error accessing:", url)
+        print("Error accessing: ", url)
         if e.code == 503 and 'CaptchaRedirect' in e.read():
             print("Google is requiring a Captcha. " \
                   "For more information see: 'https://support.google.com/websearch/answer/86640'")
         return None
     except Exception as e:
-        print("Error accessing:", url)
+        print("Error accessing: ", url)
         print(e)
         return None
 

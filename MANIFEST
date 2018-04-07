@@ -10,6 +10,7 @@ google/modules/currency.py
 google/modules/images.py
 google/modules/shopping_search.py
 google/modules/standard_search.py
+google/modules/news_search.py
 google/modules/utils.py
 google/tests/__init__.py
 google/tests/test_google.py
